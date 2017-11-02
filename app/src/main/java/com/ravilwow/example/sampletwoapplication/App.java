@@ -12,12 +12,10 @@ import java.lang.reflect.Method;
  */
 public class App extends Application {
     public static final String TAG = "LOG_TAG";
-    public static App application;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        application = this;
         String processName = getProcessName(this);
         switch (processName) {
             case "com.ravilwow.example.sampletwoapplication":
