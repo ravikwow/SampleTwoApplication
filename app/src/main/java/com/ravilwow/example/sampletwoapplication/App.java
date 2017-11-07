@@ -15,19 +15,7 @@ import java.lang.reflect.Method;
 public class App extends Application {
     public static final String TAG = "LOG_TAG";
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        String processName = getProcessName(this);
-        processName = processName.replace(getApplicationInfo().processName, "");
-        if (":service".equals(processName)) {
-            Log.d(TAG, "App.onCreate: service " + this);
-        } else {
-            Log.d(TAG, "App.onCreate: general " + this);
-        }
-    }
-
-    private String getProcessName(Application app) {
+    private static String getProcessName(Application app) {
         try {
             Field loadedApkField = app.getClass().getField("mLoadedApk");
             loadedApkField.setAccessible(true);
@@ -41,7 +29,7 @@ public class App extends Application {
             return (String) getProcessName.invoke(activityThread, null);
         } catch (Exception e) {
             int pid = android.os.Process.myPid();
-            ActivityManager manager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+            ActivityManager manager = (ActivityManager) app.getSystemService(Context.ACTIVITY_SERVICE);
             for (ActivityManager.RunningAppProcessInfo processInfo : manager.getRunningAppProcesses()) {
                 if (processInfo.pid == pid) {
                     return processInfo.processName;
@@ -49,5 +37,17 @@ public class App extends Application {
             }
         }
         return "";
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        String processName = getProcessName(this);
+        processName = processName.replace(getApplicationInfo().processName, "");
+        if (":service".equals(processName)) {
+            Log.d(TAG, "App.onCreate: service " + this);
+        } else {
+            Log.d(TAG, "App.onCreate: general " + this);
+        }
     }
 }
