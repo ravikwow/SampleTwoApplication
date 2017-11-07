@@ -17,14 +17,11 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         String processName = getProcessName(this);
-        switch (processName) {
-            case "com.ravilwow.example.sampletwoapplication":
-                Log.d(TAG, "App.onCreate: general " + this);
-                break;
-            case "com.ravilwow.example.sampletwoapplication:service":
-                Log.d(TAG, "App.onCreate: service " + this);
-                break;
-            default:
+        processName = processName.replace(getApplicationInfo().processName, "");
+        if (":service".equals(processName)) {
+            Log.d(TAG, "App.onCreate: service " + this);
+        } else {
+            Log.d(TAG, "App.onCreate: general " + this);
         }
     }
 
