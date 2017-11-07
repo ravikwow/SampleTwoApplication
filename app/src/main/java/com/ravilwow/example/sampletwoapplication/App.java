@@ -1,6 +1,8 @@
 package com.ravilwow.example.sampletwoapplication;
 
+import android.app.ActivityManager;
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
 import java.lang.reflect.Field;
@@ -26,7 +28,6 @@ public class App extends Application {
     }
 
     private String getProcessName(Application app) {
-        String processName = null;
         try {
             Field loadedApkField = app.getClass().getField("mLoadedApk");
             loadedApkField.setAccessible(true);
@@ -37,10 +38,16 @@ public class App extends Application {
             Object activityThread = activityThreadField.get(loadedApk);
 
             Method getProcessName = activityThread.getClass().getDeclaredMethod("getProcessName", null);
-            processName = (String) getProcessName.invoke(activityThread, null);
+            return (String) getProcessName.invoke(activityThread, null);
         } catch (Exception e) {
-            e.printStackTrace();
+            int pid = android.os.Process.myPid();
+            ActivityManager manager = (ActivityManager) this.getSystemService(Context.ACTIVITY_SERVICE);
+            for (ActivityManager.RunningAppProcessInfo processInfo : manager.getRunningAppProcesses()) {
+                if (processInfo.pid == pid) {
+                    return processInfo.processName;
+                }
+            }
         }
-        return processName;
+        return "";
     }
 }
